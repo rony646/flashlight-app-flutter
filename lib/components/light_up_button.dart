@@ -9,7 +9,7 @@ class LightUpButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 120),
+      duration: const Duration(milliseconds: 100),
       height: 100,
       width: 100,
       decoration: isActive

@@ -1,4 +1,6 @@
+import 'package:flashlight/components/custom_slider.dart';
 import 'package:flashlight/components/light_up_button.dart';
+import 'package:flashlight/components/sos_button.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -15,11 +17,18 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final ThemeData theme = ThemeData(useMaterial3: true);
   bool lightIsOn = false;
+  bool SOSModeOn = false;
 
   handleFlashlightToggle(bool value) {
     // here i will turn on the phone's flashlight
     setState(() {
       lightIsOn = value;
+    });
+  }
+
+  handleSOSModeToggle(bool value) {
+    setState(() {
+      SOSModeOn = value;
     });
   }
 
@@ -42,11 +51,13 @@ class _MyAppState extends State<MyApp> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Slider here'),
-                Column(children: [
-                  LightUpButton(lightIsOn, handleFlashlightToggle),
-                  const Text('SOS Button')
-                ]),
+                CustomSlider(),
+                Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      LightUpButton(lightIsOn, handleFlashlightToggle),
+                      SOSButton(SOSModeOn, handleSOSModeToggle),
+                    ]),
                 const Text('Slider here'),
               ],
             ),
