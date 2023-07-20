@@ -18,6 +18,8 @@ class _MyAppState extends State<MyApp> {
   final ThemeData theme = ThemeData(useMaterial3: true);
   bool lightIsOn = false;
   bool SOSModeOn = false;
+  double strobeLevel = 0.0;
+  double timerValue = 0.0;
 
   handleFlashlightToggle(bool value) {
     // here i will turn on the phone's flashlight
@@ -32,8 +34,21 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
+  handleStrobeLevelChange(double value) {
+    setState(() {
+      strobeLevel = value;
+    });
+  }
+
+  handleTimerValueChange(double value) {
+    setState(() {
+      timerValue = value;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    print('level: $strobeLevel');
     return MaterialApp(
       title: 'Flutter Demo',
       theme: theme.copyWith(
@@ -44,21 +59,36 @@ class _MyAppState extends State<MyApp> {
           )),
       home: Scaffold(
         body: Container(
-          color: const Color(0xFF2D386C),
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/images/moon.jpg'),
+              fit: BoxFit.cover,
+            ),
+          ),
+          // color: const Color(0xFF2D386C),
           alignment: Alignment.center,
-          child: SizedBox(
-            height: 200,
+          child: Container(
+            margin: const EdgeInsets.only(top: 200),
+            height: 220,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                CustomSlider(),
+                CustomSlider(
+                  strobeValue: strobeLevel,
+                  onChange: handleStrobeLevelChange,
+                  label: 'STROBE',
+                ),
                 Column(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       LightUpButton(lightIsOn, handleFlashlightToggle),
                       SOSButton(SOSModeOn, handleSOSModeToggle),
                     ]),
-                const Text('Slider here'),
+                CustomSlider(
+                  strobeValue: timerValue,
+                  onChange: handleTimerValueChange,
+                  label: 'TIMER',
+                ),
               ],
             ),
           ),

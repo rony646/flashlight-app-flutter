@@ -1,20 +1,40 @@
 import 'package:flutter/material.dart';
-import 'package:syncfusion_flutter_sliders/sliders.dart';
 
 class CustomSlider extends StatelessWidget {
-  const CustomSlider({super.key});
+  final double strobeValue;
+  final Function(double) onChange;
+  final String label;
+
+  const CustomSlider({
+    super.key,
+    required this.strobeValue,
+    required this.onChange,
+    required this.label,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: RotatedBox(
-        quarterTurns: 3,
-        child: Slider(
-          value: 0.3,
-          onChanged: (value) {
-            print('Slider value: $value');
-          },
-        ),
+    return SizedBox(
+      width: 80,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          RotatedBox(
+            quarterTurns: 3,
+            child: Slider(
+              value: strobeValue,
+              onChanged: onChange,
+            ),
+          ),
+          Container(
+            width: 80,
+            alignment: Alignment.center,
+            child: Text(
+              label,
+              style: TextStyle(fontWeight: FontWeight.w500),
+            ),
+          )
+        ],
       ),
     );
   }
