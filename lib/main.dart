@@ -1,9 +1,14 @@
+import 'dart:async';
+
 import 'package:flashlight/components/custom_slider.dart';
 import 'package:flashlight/components/light_up_button.dart';
 import 'package:flashlight/components/sos_button.dart';
+import 'package:flashlight/components/timer_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:torch_controller/torch_controller.dart';
 
 void main() {
+  TorchController().initialize();
   runApp(const MyApp());
 }
 
@@ -15,23 +20,55 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  final torchController = TorchController();
   final ThemeData theme = ThemeData(useMaterial3: true);
   bool lightIsOn = false;
   bool SOSModeOn = false;
-  double strobeLevel = 0.0;
-  double timerValue = 0.0;
+  double strobeLevel = 1;
+  double timerValue = 60.0;
 
-  handleFlashlightToggle(bool value) {
-    // here i will turn on the phone's flashlight
+  turnOffLight() {
+    if (lightIsOn) {
+      torchController.toggle();
+      setState(() {
+        lightIsOn = false;
+      });
+    }
+  }
+
+  handleFlashlightToggle(bool value) async {
+    bool torchStatus = await torchController.toggle(
+        intensity: double.parse(strobeLevel.toStringAsFixed(2))) as bool;
+
+    Timer(
+        Duration(
+          seconds: int.parse(
+            timerValue.toStringAsFixed(0),
+          ),
+        ),
+        () => turnOffLight());
+
     setState(() {
-      lightIsOn = value;
+      lightIsOn = torchStatus;
     });
   }
+
+  Timer? interval;
 
   handleSOSModeToggle(bool value) {
     setState(() {
       SOSModeOn = value;
     });
+
+    if (value) {
+      interval = Timer.periodic(
+        const Duration(seconds: 1),
+        (timer) => torchController.toggle(),
+      );
+    } else {
+      interval?.cancel();
+      turnOffLight();
+    }
   }
 
   handleStrobeLevelChange(double value) {
@@ -48,7 +85,6 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    print('level: $strobeLevel');
     return MaterialApp(
       title: 'Flutter Demo',
       theme: theme.copyWith(
@@ -84,7 +120,7 @@ class _MyAppState extends State<MyApp> {
                       LightUpButton(lightIsOn, handleFlashlightToggle),
                       SOSButton(SOSModeOn, handleSOSModeToggle),
                     ]),
-                CustomSlider(
+                TimerSlider(
                   strobeValue: timerValue,
                   onChange: handleTimerValueChange,
                   label: 'TIMER',
