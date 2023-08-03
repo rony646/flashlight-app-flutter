@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flashlight/components/custom_slider.dart';
 import 'package:flashlight/components/light_up_button.dart';
 import 'package:flashlight/components/sos_button.dart';
@@ -21,11 +22,21 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final torchController = TorchController();
+  final player = AudioPlayer();
   final ThemeData theme = ThemeData(useMaterial3: true);
   bool lightIsOn = false;
   bool SOSModeOn = false;
   double strobeLevel = 1;
   double timerValue = 60.0;
+
+  playSound() async {
+    player.setReleaseMode(ReleaseMode.loop);
+    await player.play(AssetSource('sounds/sos.mp3'));
+  }
+
+  stopSound() async {
+    player.setReleaseMode(ReleaseMode.stop);
+  }
 
   turnOffLight() {
     if (lightIsOn) {
@@ -61,6 +72,7 @@ class _MyAppState extends State<MyApp> {
     });
 
     if (value) {
+      playSound();
       interval = Timer.periodic(
         const Duration(seconds: 1),
         (timer) => torchController.toggle(),
@@ -68,6 +80,7 @@ class _MyAppState extends State<MyApp> {
     } else {
       interval?.cancel();
       turnOffLight();
+      stopSound();
     }
   }
 
