@@ -30,6 +30,7 @@ class _MyAppState extends State<MyApp> {
   double timerValue = 60.0;
 
   playSound() async {
+    player.setVolume(1);
     player.setReleaseMode(ReleaseMode.loop);
     await player.play(AssetSource('sounds/sos.mp3'));
   }
@@ -130,8 +131,10 @@ class _MyAppState extends State<MyApp> {
                 Column(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      LightUpButton(lightIsOn, handleFlashlightToggle),
-                      SOSButton(SOSModeOn, handleSOSModeToggle),
+                      LightUpButton(
+                          lightIsOn, handleFlashlightToggle, SOSModeOn),
+                      SOSButton(SOSModeOn, handleSOSModeToggle,
+                          (!SOSModeOn && lightIsOn)),
                     ]),
                 TimerSlider(
                   strobeValue: timerValue,

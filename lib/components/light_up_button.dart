@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 
 class LightUpButton extends StatelessWidget {
   final bool isActive;
+  final bool isDisabled;
   final Function(bool) onChange;
 
-  const LightUpButton(this.isActive, this.onChange, {super.key});
+  const LightUpButton(this.isActive, this.onChange, this.isDisabled,
+      {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -43,11 +45,11 @@ class LightUpButton extends StatelessWidget {
                   style: BorderStyle.solid,
                   width: 6)),
       child: IconButton(
-        color: Colors.white,
+        color: isDisabled ? const Color(0x849E9E9E) : Colors.white,
         iconSize: 60,
         icon: const Icon(Icons.power_settings_new),
         onPressed: () {
-          onChange(!isActive);
+          !isDisabled && onChange(!isActive);
         },
       ),
     );

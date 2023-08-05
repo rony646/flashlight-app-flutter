@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 
 class SOSButton extends StatelessWidget {
   final Function(bool) onChange;
+  final bool isDisabled;
   final bool isActive;
 
-  const SOSButton(this.isActive, this.onChange, {super.key});
+  const SOSButton(this.isActive, this.onChange, this.isDisabled, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -40,12 +41,15 @@ class SOSButton extends StatelessWidget {
           style: TextStyle(
             fontWeight: FontWeight.w700,
             fontSize: 16,
-            color:
-                isActive ? Colors.white : Theme.of(context).colorScheme.primary,
+            color: isActive
+                ? Colors.white
+                : isDisabled
+                    ? const Color(0x849E9E9E)
+                    : Theme.of(context).colorScheme.primary,
           ),
         ),
         onPressed: () {
-          onChange(!isActive);
+          !isDisabled && onChange(!isActive);
         },
       ),
     );
