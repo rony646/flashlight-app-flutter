@@ -21,62 +21,81 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final torchController = TorchController();
-  final player = AudioPlayer();
-  final ThemeData theme = ThemeData(useMaterial3: true);
-  bool lightIsOn = false;
-  bool SOSModeOn = false;
-  double strobeLevel = 1;
-  double timerValue = 60.0;
+  final _torchController = TorchController();
+  final _player = AudioPlayer();
+  final ThemeData _theme = ThemeData(useMaterial3: true);
+  bool _lightIsOn = false;
+  bool _SOSModeOn = false;
+  double _strobeLevel = 1;
+  double _timerValue = 60.0;
+  final _messangerKey = GlobalKey<ScaffoldMessengerState>();
 
   playSound() async {
-    player.setVolume(1);
-    player.setReleaseMode(ReleaseMode.loop);
-    await player.play(AssetSource('sounds/sos.mp3'));
+    _player.setVolume(1);
+    _player.setReleaseMode(ReleaseMode.loop);
+    await _player.play(AssetSource('sounds/sos.mp3'));
   }
 
   stopSound() async {
-    player.setReleaseMode(ReleaseMode.stop);
+    _player.setReleaseMode(ReleaseMode.stop);
   }
 
   turnOffLight() {
-    if (lightIsOn) {
-      torchController.toggle();
+    if (_lightIsOn) {
+      _torchController.toggle();
       setState(() {
-        lightIsOn = false;
+        _lightIsOn = false;
       });
     }
   }
 
   handleFlashlightToggle(bool value) async {
-    bool torchStatus = await torchController.toggle(
-        intensity: double.parse(strobeLevel.toStringAsFixed(2))) as bool;
+    try {
+      bool torchStatus = await _torchController.toggle(
+          intensity: double.parse(_strobeLevel.toStringAsFixed(2))) as bool;
 
-    Timer(
-        Duration(
-          seconds: int.parse(
-            timerValue.toStringAsFixed(0),
+      Timer(
+          Duration(
+            seconds: int.parse(
+              _timerValue.toStringAsFixed(0),
+            ),
+          ),
+          () => turnOffLight());
+
+      setState(() {
+        _lightIsOn = torchStatus;
+      });
+    } catch (error) {
+      _messangerKey.currentState?.showSnackBar(
+        SnackBar(
+          backgroundColor: Theme.of(context).colorScheme.error,
+          elevation: 5.0,
+          content: const Center(
+            child: Text(
+              'There was an error when trying to turn on the light :(',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ),
-        () => turnOffLight());
-
-    setState(() {
-      lightIsOn = torchStatus;
-    });
+      );
+    }
   }
 
   Timer? interval;
 
   handleSOSModeToggle(bool value) {
     setState(() {
-      SOSModeOn = value;
+      _SOSModeOn = value;
     });
 
     if (value) {
       playSound();
       interval = Timer.periodic(
         const Duration(seconds: 1),
-        (timer) => torchController.toggle(),
+        (timer) => _torchController.toggle(),
       );
     } else {
       interval?.cancel();
@@ -87,23 +106,24 @@ class _MyAppState extends State<MyApp> {
 
   handleStrobeLevelChange(double value) {
     setState(() {
-      strobeLevel = value;
+      _strobeLevel = value;
     });
   }
 
   handleTimerValueChange(double value) {
     setState(() {
-      timerValue = value;
+      _timerValue = value;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      scaffoldMessengerKey: _messangerKey,
       title: 'Flutter Demo',
-      theme: theme.copyWith(
+      theme: _theme.copyWith(
           textTheme: Typography().white,
-          colorScheme: theme.colorScheme.copyWith(
+          colorScheme: _theme.colorScheme.copyWith(
             primary: const Color(0xffF7AE38),
             secondary: const Color(0xFF2D386C),
           )),
@@ -124,7 +144,7 @@ class _MyAppState extends State<MyApp> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 CustomSlider(
-                  strobeValue: strobeLevel,
+                  strobeValue: _strobeLevel,
                   onChange: handleStrobeLevelChange,
                   label: 'STROBE',
                 ),
@@ -132,12 +152,12 @@ class _MyAppState extends State<MyApp> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       LightUpButton(
-                          lightIsOn, handleFlashlightToggle, SOSModeOn),
-                      SOSButton(SOSModeOn, handleSOSModeToggle,
-                          (!SOSModeOn && lightIsOn)),
+                          _lightIsOn, handleFlashlightToggle, _SOSModeOn),
+                      SOSButton(_SOSModeOn, handleSOSModeToggle,
+                          (!_SOSModeOn && _lightIsOn)),
                     ]),
                 TimerSlider(
-                  strobeValue: timerValue,
+                  strobeValue: _timerValue,
                   onChange: handleTimerValueChange,
                   label: 'TIMER',
                 ),
